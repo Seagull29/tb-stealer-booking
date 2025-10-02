@@ -32,7 +32,7 @@ export default function FormComboBox({ options, control, name, placeholder, labe
     const items = options.map((item, index) => {
         const isSelected = item.value === value;
         return (
-            <CommandItem className="text-catppuccin-latte-text" key={`combobox-${index}-${item.value}`} value={item.searchTerm} onSelect={selectOption}>
+            <CommandItem className="text-ctp-frappe-text cursor-pointer" key={`combobox-${index}-${item.value}`} value={item.searchTerm} onSelect={selectOption}>
                 {item.optionLabel}
                 <CheckIcon className={`ml-auto transition-all size-4 ${isSelected ? "opacity-100" : "opacity-0"}`} />
             </CommandItem>
@@ -45,10 +45,10 @@ export default function FormComboBox({ options, control, name, placeholder, labe
 
     return (
         <div className="group w-full text-sm space-y-2">
-            <p className="font-medium text-grouptravel-900">{label}</p>
+            <p className="font-medium text-ctp-frappe-text">{label}</p>
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <button ref={ref} className="cursor-pointer py-2 px-3 gap-2 text-grouptravel-900 font-medium w-full flex justify-between relative items-center rounded-md ring-1 shadow ring-stone-300 group-has-[:focus]:ring-grouptravel-600/40 group-has-[:focus]:bg-grouptravel-50 group-has-[:focus]:ring-[3px] group-hover:bg-grouptravel-50 group-hover:ring-grouptravel-600/45 transition group-has-[:disabled]:opacity-70 dark:bg-catppuccin-macchiato-surface-0 dark:group-hover:bg-catppuccin-macchiato-mantle dark:ring-catppuccin-macchiato-surface-1 dark:group-has-[:focus]:bg-catppuccin-macchiato-mantle dark:group-hover:ring-catppuccin-macchiato-overlay-0/50 dark:group-has-[:focus]:ring-catppuccin-macchiato-overlay-0/50">
+                    <button ref={ref} className="cursor-pointer py-2 px-3 gap-2 text-ctp-frappe-text font-medium w-full flex justify-between relative items-center rounded-md ring-1 shadow ring-ctp-frappe-overlay-0 group-has-[:focus]:ring-ctp-frappe-lavender group-has-[:focus]:bg-ctp-frappe-surface-1 group-has-[:focus]:ring-[3px] group-hover:bg-ctp-frappe-surface-1 group-hover:ring-ctp-frappe-lavender transition group-has-[:disabled]:opacity-70">
                         <div className="flex items-center gap-2">
                             <div className="">
                                 {icon}
@@ -57,7 +57,7 @@ export default function FormComboBox({ options, control, name, placeholder, labe
                                 value ?
                                     <span className="px-3.5">{selectedOption}</span>
                                     :
-                                    <span className="px-3.5 text-grouptravel-900/80">{placeholder}</span>
+                                    <span className="px-3.5 text-ctp-frappe-subtext-0">{placeholder}</span>
                             }
                         </div>
                         <ChevronsUpDownIcon className="opacity-50 size-5" />
@@ -69,9 +69,9 @@ export default function FormComboBox({ options, control, name, placeholder, labe
                         const normalizedSearch = search.toLowerCase().replaceAll("í", "i").replaceAll("é", "e").replaceAll("á", "a").replaceAll("ó", "o").replaceAll("ú", "u");
                         return normalizedValue.includes(normalizedSearch) ? 1 : 0;
                     }}>
-                        <CommandInput placeholder="Buscar" className="text-catppuccin-latte-text" />
+                        <CommandInput placeholder="Buscar" className="text-ctp-frappe-text" />
                         <CommandList className="vertical-scrollbar">
-                            <CommandEmpty className="text-catppuccin-latte-subtext-0 text-sm text-center mt-4">Sin resultados</CommandEmpty>
+                            <CommandEmpty className="text-ctp-frappe-subtext-0 text-sm text-center mt-4">Sin resultados</CommandEmpty>
                             <CommandGroup>
                                 {items}
                             </CommandGroup>
@@ -81,7 +81,7 @@ export default function FormComboBox({ options, control, name, placeholder, labe
             </Popover>
             {
                 Boolean(fieldErrors) &&
-                <section className="bg-red-500 text-white w-fit shadow rounded-md flex gap-2 py-1 px-3 items-center text-xs dark:bg-catppuccin-macchiato-red dark:text-red-950">
+                <section className="bg-ctp-frappe-red text-ctp-frappe-crust w-fit shadow rounded-md flex gap-2 py-1 px-3 items-center text-xs dark:bg-catppuccin-macchiato-red dark:text-red-950">
                     <div>
                         <TriangleAlertIcon className="w-4" />
                     </div>

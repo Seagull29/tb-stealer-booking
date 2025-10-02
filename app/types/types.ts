@@ -4,3 +4,7 @@ export type FormComboBoxOption = {
     displayLabel: string;
     optionLabel: React.ReactNode;
 };
+
+export type SessionSchema = {
+    token: string;
+};
