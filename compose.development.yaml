@@ -12,7 +12,7 @@ services:
     volumes:
       - type: bind
         source: .
-        target: /usr/src/service
+        target: /usr/src/client
     restart: always
 
   

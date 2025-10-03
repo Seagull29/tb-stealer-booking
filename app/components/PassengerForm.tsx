@@ -25,7 +25,7 @@ export default function PassengerForm({ index, removePassenger }: Props) {
                     </button>
                 }
             </header>
-            <main className="grid grid-cols-3 gap-5 mt-5">
+            <main className="grid grid-cols-2 gap-5 mt-5">
                 <FormInput
                     label="Nombre"
                     errors={errors.passengers?.[index]?.name}

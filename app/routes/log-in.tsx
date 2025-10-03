@@ -36,6 +36,7 @@ export async function clientAction({ context, request }: Route.ClientActionArgs)
         }
         const { accessToken } = await response.json();
         context.set(sessionContext, { token: accessToken });
+        localStorage.setItem("auth_token", accessToken);
         return redirect("/booking");
     } catch (error) {
         return data({ error: "Problema de conexión, por favor intente más tarde" });

@@ -6,28 +6,55 @@ import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BookingSchemaValidator } from "@/lib/booking.validator";
 import { ROAD_OPTIONS } from "@/lib/data";
-import { redirect, useFetcher } from "react-router";
+import { data, redirect, useFetcher } from "react-router";
 import BouncingLoader from "@/components/BouncingLoader";
-import type { Route } from "./+types/booking";
 import { customDayjs } from "@/lib/utils";
 import { sessionContext } from "@/stores/session.context";
-
+import CLIENT_CONFIG from "@/config/client.config";
+import { useDisplayResponseToast } from "@/hooks/useDisplayResponseToast";
+import { useEffect } from "react";
+import type { Route } from "./+types/book";
+import { requireAuthentication } from "@/middlewares/authentication.middleware";
 
 export const clientMiddleware: Route.ClientMiddlewareFunction[] = [
-    ({ context }) => {
-        const sessionToken = context.get(sessionContext)?.token;
-        if (!sessionToken) {
-            throw redirect("/");
-        }
-    }
+    requireAuthentication as Route.ClientMiddlewareFunction
 ];
 
 export async function clientAction({ context, request }: Route.ClientActionArgs) {
-    const passenger = (await request.formData()).get("passengers");
-    console.log(passenger);
+    const formData = await request.formData();
+    const passenger = formData.get("passengers");
+    const date = formData.get("date");
+    const road = formData.get("road");
+    const url = new URL(`${CLIENT_CONFIG.get("API_URL")}/tickets/book`);
+    try {
+        const response = await fetch(url.toString(), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${context.get(sessionContext)?.token}`
+            },
+            body: JSON.stringify({ date, road, passenger })
+        });
+        switch (response.status) {
+            case 500:
+                return data({ error: "Ocurrió un error en el servidor, por favor intente más tarde" });
+            case 400:
+                return data({ error: "Datos de reserva inválidos, por favor verifique e intente nuevamente" });
+            case 409:
+                return data({ error: "No hay disponibilidad para la fecha y ruta seleccionadas" });
+            case 401:
+                if (typeof window !== 'undefined') {
+                    localStorage.removeItem('auth_token');
+                }
+                throw redirect("/");
+        }
+        return data({ message: "Reserva programada exitosamente" });
+    } catch (error) {
+        return data({ error: "Problema de conexión, por favor intente más tarde" });
+    }
 }
 
-export default function BookingPage() {
+export default function BookPage() {
     const fetcher = useFetcher();
     const isPending = fetcher.state !== "idle";
 
@@ -47,8 +74,8 @@ export default function BookingPage() {
             }]
         }
     });
-    const { control, formState: { errors }, handleSubmit } = formHandler;
-    const { append, fields, remove } = useFieldArray({
+    const { control, reset, handleSubmit } = formHandler;
+    const { append, fields, remove, replace } = useFieldArray({
         control,
         name: "passengers"
     });
@@ -89,6 +116,25 @@ export default function BookingPage() {
             passengers: JSON.stringify(passengers)
         }, { method: "POST"});
     });
+
+    useDisplayResponseToast(fetcher);
+
+    useEffect(() => {
+        if (fetcher.data?.message) {
+            reset();
+            replace([{
+                name: "",
+                lastName: "",
+                secondLastName: "",
+                birthdate: "",
+                countryId: "",
+                passport: "",
+                sex: "" as "Femenino" | "Masculino",
+                documentTypeId: "",
+                taxId: ""
+            }]);
+        }
+    }, [fetcher.data]);
 
     return (
         <main className="min-h-screen bg-ctp-frappe-base flex flex-col items-center">
