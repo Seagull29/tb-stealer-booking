@@ -2,13 +2,13 @@ import { data, Link, useNavigate } from "react-router";
 import type { Route } from "./+types/bookings";
 import { requireAuthentication } from "@/middlewares/authentication.middleware";
 import { sessionContext } from "@/stores/session.context";
-import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
 import CLIENT_CONFIG from "@/config/client.config";
 import type { BookingSchema } from "@/types/types";
 import { AlertTriangleIcon, BookPlusIcon } from "lucide-react";
 import BouncingLoader from "@/components/BouncingLoader";
 import { useEffect } from "react";
 import BookingCard from "@/components/BookingCard";
+import useSWR from "swr";
 
 const fakeBookings: BookingSchema[] = [
     {
@@ -121,22 +121,24 @@ export async function clientLoader({ context }: Route.ClientLoaderArgs) {
 export default function BookingsPage({ loaderData }: Route.ComponentProps) {
     const { token } = loaderData;
     const navigate = useNavigate();
-    const { isError, isPending, isSuccess, data, error } = useQuery({
-        queryKey: ["bookings", token],
-        queryFn: ({ queryKey }) => fetchBookings(queryKey[1]!)
-    });
+    const { data, error, isLoading, isValidating } = useSWR(
+        ["bookings", token],
+        ([, token]) => fetchBookings(token!),
+        { revalidateOnFocus: true }
+    )
     const cards = data?.map(booking => (
         <BookingCard key={booking.bookingId} booking={booking} />
     ));
     useEffect(() => {
         if (error?.message === "Unauthorized") {
+            localStorage.removeItem('auth_token');
             navigate({ pathname: "/" });
         }
     }, [error]);
     return (
         <main className="min-h-screen bg-ctp-frappe-base flex flex-col items-center">
             {
-                isError &&
+                error &&
                 <main className="border m-20 border-ctp-frappe-overlay-0 rounded-lg p-7 bg-ctp-frappe-surface-0 shadow-xl">
                     <section className="flex flex-col gap-3 items-center text-ctp-frappe-text">
                         <AlertTriangleIcon className="size-10" />
@@ -146,7 +148,7 @@ export default function BookingsPage({ loaderData }: Route.ComponentProps) {
                 </main>
             }
             {
-                !isError &&
+                !error &&
                 <section className="max-w-7xl w-full bg-ctp-frappe-surface-0 rounded-xl mx-20 my-20 border-ctp-frappe-surface-2 border shadow-xl px-7 py-10">
                     <header className="flex gap-5 justify-between items-center">
                         <div className="">
@@ -159,13 +161,13 @@ export default function BookingsPage({ loaderData }: Route.ComponentProps) {
                         </Link>
                     </header>
                     {
-                        isPending &&
+                        (isLoading || isValidating) &&
                         <div className="mt-5">
                             <BouncingLoader className="size-5 bg-ctp-frappe-mauve" />
                         </div>
                     }
                     {
-                        isSuccess &&
+                        !(isLoading || isValidating) &&
                         <main className="flex flex-col gap-5 mt-10">
                             {cards}
                         </main>

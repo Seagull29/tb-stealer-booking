@@ -1,21 +1,24 @@
 import { AlarmClockOffIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { useFetcher } from "react-router";
+import { useFetcher, useLoaderData } from "react-router";
 import { useEffect, useState } from "react";
 import { useDisplayResponseToast } from "@/hooks/useDisplayResponseToast";
 import BouncingLoader from "./BouncingLoader";
+import { mutate } from "swr";
 
 interface Props {
     bookingId: string;
 }
 
 export default function StopBookingButton({ bookingId }: Props) {
+    const { token } = useLoaderData();
     const [open, setOpen] = useState<boolean>(false);
     const fetcher = useFetcher();
     const isPending = fetcher.state !== "idle";
     useEffect(() => {
         if (fetcher.data?.message) {
             setOpen(false);
+            mutate(["bookings", token]);
         }
     }, [fetcher.data])
     useDisplayResponseToast(fetcher);

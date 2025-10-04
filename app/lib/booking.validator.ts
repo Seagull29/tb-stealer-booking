@@ -32,10 +32,11 @@ export const BookingSchemaValidator = z.object({
         if (Number(day) > 31 || Number(month) > 12 || year?.length !== 4) {
             return false;
         }
+        const dayjsDate = customDayjs(date, "DD/MM/YYYY");
         if (Number(day) === 29 && Number(month) === 2) {
-            return customDayjs(date, "DD/MM/YYYY").isLeapYear();
+            return dayjsDate.isLeapYear();
         }
-        return true;
+        return dayjsDate.isAfter(customDayjs().add(2, "day"), "day");
     }, { message: "Debe ingresar una fecha correcta" }),
     road: z.string({ error: "Debe seleccionar la ruta" }).refine(value => {
         return ["1", "5"].includes(value);

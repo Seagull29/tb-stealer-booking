@@ -17,8 +17,10 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export const clientMiddleware: Route.ClientMiddlewareFunction[] = [
-    ({ context }) => {
-
+    ({ }) => {
+        if (localStorage.getItem("auth_token")) {
+            throw redirect("/bookings");
+        }
     }
 ]
 

@@ -10,9 +10,8 @@ import { Toaster } from "react-hot-toast";
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import BouncingLoader from "./components/BouncingLoader";
 
-const queryClient = new QueryClient();
 
 export const links: Route.LinksFunction = () => [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -45,15 +44,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
     );
 }
 
+export function HydrateFallback() {
+    return (
+        <div className="grid place-content-center">
+            <BouncingLoader className="size-5 bg-ctp-frappe-peach" />
+        </div>
+    );
+}
+
 export default function App() {
     return (
-        <QueryClientProvider client={queryClient}>
+        <>
             <Toaster
                 reverseOrder={false}
                 gutter={12}
             />
             <Outlet />
-        </QueryClientProvider>
+        </>
     )
 }
 

@@ -13,13 +13,21 @@ interface Props {
 
 export default function BookingCard({ booking }: Props) {
     const roadName = ROAD_OPTIONS.find(road => road.value === String(booking?.road))?.label;
-
+    
     return (
         <article className="bg-ctp-frappe-mantle border rounded-lg p-5 border-ctp-frappe-surface-1 shadow-md">
             <header className="flex gap-5 justify-between items-center text-ctp-frappe-text">
                 <div className="flex items-center gap-2">
                     <MapPinIcon className="size-5" />
                     <p className="font-medium text-lg">{roadName}</p>
+                    {
+                        booking?.status === "SCHEDULED" &&
+                        <p className="px-2 py-1 rounded-lg text-sm bg-ctp-frappe-yellow text-yellow-950">Por iniciar</p>
+                    }
+                    {
+                        booking?.status === "BOOKED" &&
+                        <p className="px-2 py-1 rounded-lg font-medium text-sm bg-ctp-frappe-teal text-teal-950">Programada</p>
+                    }
                 </div>
                 <StopBookingButton bookingId={booking.bookingId} />
             </header>
