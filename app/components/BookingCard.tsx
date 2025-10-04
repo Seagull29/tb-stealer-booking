@@ -44,7 +44,7 @@ export default function BookingCard({ booking }: Props) {
                             <CalendarClockIcon className="size-4" />
                             <p className="">Primera ejecución</p>
                         </div>
-                        <p className="text-ctp-frappe-text">{customDayjs(booking.startingBookingTime).format("DD/MM/YYYY HH:mm")}</p>
+                        <p className="text-ctp-frappe-text">{customDayjs(booking.startingBookingTime).format("DD/MM/YYYY HH:mm:ss")}</p>
                     </article>
                     <article className="flex flex-col gap-1 text-sm">
                         <div className="flex text-ctp-frappe-subtext-0 items-center gap-1">
