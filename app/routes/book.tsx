@@ -1,12 +1,12 @@
 import FormDateInput from "@/components/FormDateInput";
 import FormSelect from "@/components/FormSelect";
 import PassengerForm from "@/components/PassengerForm";
-import { PlusIcon, TicketCheckIcon, TrafficConeIcon } from "lucide-react";
+import { PlusIcon, ScrollTextIcon, TicketCheckIcon, TrafficConeIcon } from "lucide-react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BookingSchemaValidator } from "@/lib/booking.validator";
 import { ROAD_OPTIONS } from "@/lib/data";
-import { data, redirect, useFetcher } from "react-router";
+import { data, Link, redirect, useFetcher } from "react-router";
 import BouncingLoader from "@/components/BouncingLoader";
 import { customDayjs } from "@/lib/utils";
 import { sessionContext } from "@/stores/session.context";
@@ -22,7 +22,7 @@ export const clientMiddleware: Route.ClientMiddlewareFunction[] = [
 
 export async function clientAction({ context, request }: Route.ClientActionArgs) {
     const formData = await request.formData();
-    const passenger = formData.get("passengers");
+    const passenger = formData.get("passengers") as string;
     const date = formData.get("date");
     const road = formData.get("road");
     const url = new URL(`${CLIENT_CONFIG.get("API_URL")}/tickets/book`);
@@ -33,7 +33,7 @@ export async function clientAction({ context, request }: Route.ClientActionArgs)
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${context.get(sessionContext)?.token}`
             },
-            body: JSON.stringify({ date, road, passenger })
+            body: JSON.stringify({ date, road: Number(road), passengers: JSON.parse(passenger!) })
         });
         switch (response.status) {
             case 500:
@@ -48,7 +48,8 @@ export async function clientAction({ context, request }: Route.ClientActionArgs)
                 }
                 throw redirect("/");
         }
-        return data({ message: "Reserva programada exitosamente" });
+        // return data({ message: "Reserva programada exitosamente" });
+        return redirect("/bookings");
     } catch (error) {
         return data({ error: "Problema de conexión, por favor intente más tarde" });
     }
@@ -114,7 +115,7 @@ export default function BookPage() {
             date: customDayjs(data.date, "DD/MM/YYYY").format("YYYY-MM-DD"),
             road: Number(data.road),
             passengers: JSON.stringify(passengers)
-        }, { method: "POST"});
+        }, { method: "POST" });
     });
 
     useDisplayResponseToast(fetcher);
@@ -138,10 +139,16 @@ export default function BookPage() {
 
     return (
         <main className="min-h-screen bg-ctp-frappe-base flex flex-col items-center">
-            <section className="w-fit bg-ctp-frappe-surface-0 rounded-xl mx-20 my-20 border-ctp-frappe-surface-2 border shadow-xl px-7 py-10">
-                <header className="flex flex-col gap-2">
-                    <p className="text-ctp-frappe-text font-semibold text-2xl">Crear reserva</p>
-                    <p className="text-ctp-frappe-subtext-0">Registrar datos de pasajeros</p>
+            <section className="max-w-7xl w-full bg-ctp-frappe-surface-0 rounded-xl mx-20 my-20 border-ctp-frappe-surface-2 border shadow-xl px-7 py-10">
+                <header className="flex gap-5 justify-between items-center">
+                    <div className="flex flex-col gap-1">
+                        <p className="text-ctp-frappe-text font-semibold text-2xl">Crear reserva</p>
+                        <p className="text-ctp-frappe-subtext-0">Registrar datos de pasajeros</p>
+                    </div>
+                    <Link to="/bookings" className="flex items-center gap-2 px-4 text-sm py-3 rounded-md bg-ctp-frappe-peach text-ctp-frappe-crust shadow font-medium transition-all hover:scale-95">
+                        <ScrollTextIcon className="size-5" />
+                        <p>Reservas programadas</p>
+                    </Link>
                 </header>
                 <main className="mt-8">
                     <section className="grid grid-cols-2 gap-10">
@@ -177,7 +184,7 @@ export default function BookPage() {
                         <button onClick={submit} disabled={isPending} className="px-5 py-3 text-ctp-frappe-crust rounded-lg cursor-pointer transition-all flex items-center gap-2 shadow-lg bg-ctp-frappe-lavender font-medium hover:shadow-lg hover:scale-95">
                             {
                                 isPending &&
-                                <BouncingLoader className="size-4 bg-white" />                                
+                                <BouncingLoader className="size-4 bg-white" />
                             }
                             {
                                 !isPending &&

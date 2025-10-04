@@ -15,7 +15,7 @@ interface Props {
 export default function PassengerForm({ index, removePassenger }: Props) {
     const { register, control, formState: { errors } } = useFormContext<BookingSchemaValidatorType>();
     return (
-        <article className="p-5 border rounded-lg border-ctp-frappe-overlay-0 mt-8">
+        <article className="p-5 border rounded-lg border-ctp-frappe-overlay-0 mt-8 bg-ctp-frappe-mantle">
             <header className="flex justify-between items-center">
                 <p className="text-ctp-frappe-text">Pasajero {index + 1}</p>
                 {
