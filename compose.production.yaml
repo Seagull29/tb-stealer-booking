@@ -8,6 +8,8 @@ services:
     environment:
       - TZ=America/Lima
     restart: always
+    networks:
+      - dreamy-services-network
 
 networks:
   dreamy-services-network:
