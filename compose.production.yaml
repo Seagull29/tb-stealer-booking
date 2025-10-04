@@ -1,0 +1,14 @@
+name: "stealer"
+services:
+  ui-client:
+    build:
+      context: .
+      dockerfile: production.Dockerfile
+    container_name: tb-ui-client
+    environment:
+      - TZ=America/Lima
+    restart: always
+
+networks:
+  dreamy-services-network:
+    external: true
